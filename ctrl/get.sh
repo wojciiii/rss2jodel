@@ -14,9 +14,7 @@ IFS=''
 
 cat output.txt | while read LINE
 do
-    #echo "LINE=${LINE}"
     FIRST=$(echo ${LINE}| cut -d ":" -f 1)
-    #echo ${FIRST}
     grep -c "${FIRST}" ${HASH_FILE} &> /dev/null
     RET=$?
     if [[ "${RET}" -ne "0" ]]; then
