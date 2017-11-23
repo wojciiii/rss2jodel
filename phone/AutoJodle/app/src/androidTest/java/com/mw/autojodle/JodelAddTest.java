@@ -16,6 +16,7 @@ import android.support.test.uiautomator.UiDevice;
 import android.support.test.uiautomator.UiObject;
 import android.support.test.uiautomator.UiSelector;
 import android.support.test.uiautomator.Until;
+import android.util.Base64;
 import android.util.Log;
 
 import org.junit.Before;
@@ -49,11 +50,19 @@ public class JodelAddTest {
 
         try {
             Bundle extras = InstrumentationRegistry.getArguments();
-            mText = extras.getString("input_string");
+
+            String input = extras.getString("input_string");
+
+            Log.d(TAG, "Got input: " + input);
+
+            byte[] data = Base64.decode(input, Base64.DEFAULT);
+            mText = new String(data, "UTF-8");
             Log.d(TAG, "Got text: " + mText);
             mGotText = true;
         } catch (Exception e) {
             mGotText = false;
+            mText = "No text";
+            Log.e(TAG, "Error:" + e.toString());
         }
 
         // Initialize UiDevice instance
@@ -120,7 +129,7 @@ public class JodelAddTest {
             hashtag.setText("#news");
             //text.setText("Klokken er " + string);
             //hashtag.setText("#jajaja");
-            //sendBtn.click();
+            sendBtn.click();
         }
         catch (Exception e) {
             Log.d(TAG, "Exception: " + e.toString());

@@ -7,14 +7,26 @@ echo "Publish started."
 SAVED_IFS=${IFS}
 IFS=''
 
-cat ${TOPUBLISH} | while read LINE
+CONTENTS=$()
+
+declare -a BASES=()
+while read LINE
 do
     echo "Publishing \"${LINE}\""
+    BASE64=$(echo "${LINE}" | base64 -w 0)
+    BASES+=("${BASE64}")
+done <<< "$(cat ${TOPUBLISH})"
 
-    ( cd ../phone && ./run_test.sh "${LINE}" )
+#COUNT_MAX=${COUNT}
 
+cd ../phone
+
+for B in ${BASES[@]}; do
+    echo "${B}"
+    ./run_test.sh "${B}"
     sleep 60
 done
-IFS=${SAVED_IFS}
 
 echo "Publish finished."
+
+exit 0

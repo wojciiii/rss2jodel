@@ -1,16 +1,8 @@
 #!/bin/bash
 
-#INPUT="$1"
+adb shell "am instrument -w -r -e debug false -e input_string $1 -e class com.mw.autojodle.JodelAddTest#testJodelAddNewPost com.mw.autojodle.test/android.support.test.runner.AndroidJUnitRunner"
+RET=$?
+echo "RET=${RET}"
 
-INPUT=$(tr -dc '[[:print:]]' <<< "$1")
+exit 0
 
-ESCAPED=${INPUT// /\\ }
-INPUT=${ESCAPED}
-ESCAPED=${INPUT//\"/\\\"}
-
-echo $ESCAPED
-
-#adb shell am instrument -w com.mw.autojodle/com.android.test/android.support.test.runner.AndroidJUnitRunner
-adb shell am instrument -w -r\
-    -e debug false -e input_string "${ESCAPED}" \
-    -e class com.mw.autojodle.JodelAddTest#testJodelAddNewPost com.mw.autojodle.test/android.support.test.runner.AndroidJUnitRunner

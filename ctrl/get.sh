@@ -9,7 +9,7 @@ NOW=$(date +%s)
 TOPICS="output/topics-${NOW}"
 echo "Creating ${TOPICS}"
 
-rm -f "${HASH_FILE}"
+#rm -f "${HASH_FILE}"
 
 touch "${HASH_FILE}"
 
