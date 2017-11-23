@@ -10,7 +10,10 @@ IFS=''
 cat ${TOPUBLISH} | while read LINE
 do
     echo "Publishing \"${LINE}\""
-    sleep 10
+
+    ( cd ../phone && ./run_test.sh "${LINE}" )
+
+    sleep 60
 done
 IFS=${SAVED_IFS}
 

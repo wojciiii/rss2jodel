@@ -6,6 +6,7 @@ package com.mw.autojodle;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.SdkSuppress;
 import android.support.test.runner.AndroidJUnit4;
@@ -40,8 +41,21 @@ public class JodelAddTest {
     private static final String STRING_TO_BE_TYPED = "UiAutomator";
     private UiDevice mDevice;
 
+    private boolean mGotText;
+    private String mText;
+
     @Before
     public void startMainActivityFromHomeScreen() {
+
+        try {
+            Bundle extras = InstrumentationRegistry.getArguments();
+            mText = extras.getString("input_string");
+            Log.d(TAG, "Got text: " + mText);
+            mGotText = true;
+        } catch (Exception e) {
+            mGotText = false;
+        }
+
         // Initialize UiDevice instance
         mDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
 
@@ -64,12 +78,19 @@ public class JodelAddTest {
         // Wait for the app to appear
         mDevice.wait(Until.hasObject(By.pkg(BASIC_SAMPLE_PACKAGE).depth(0)),
                 LAUNCH_TIMEOUT);
+
+
     }
 
     static int defaultWait = 1000;
 
     @Test
-    public void checkPreconditions() {
+    public void testJodelAddNewPost() {
+        if (!mGotText) {
+            Log.d(TAG, "mGotText = " + mGotText);
+            return;
+        }
+
         UiObject imageBtn = new UiCollection(new UiSelector()
                 .resourceId("com.tellm.android.app:id/add_post_button"));
 
@@ -95,9 +116,11 @@ public class JodelAddTest {
         String string  = dateFormat.format(new Date());
 
         try {
-            text.setText("Klokken er " + string);
-            hashtag.setText("#jajaja");
-            sendBtn.click();
+            text.setText(mText);
+            hashtag.setText("#news");
+            //text.setText("Klokken er " + string);
+            //hashtag.setText("#jajaja");
+            //sendBtn.click();
         }
         catch (Exception e) {
             Log.d(TAG, "Exception: " + e.toString());
