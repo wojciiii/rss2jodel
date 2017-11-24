@@ -43,9 +43,10 @@ f.close()
 with open(outputfile, "w") as wf:
     for line in lines:
         print(line)
-        print("Reading from feed: %s" % line)
+        tag, url = line.split(',')
+        print("Reading from feed: %s" % url)
 
-        feed = feedparser.parse(line)
+        feed = feedparser.parse(url)
         for entry in feed['entries']:
             detail = entry['summary_detail']
             value = detail['value']
@@ -54,5 +55,5 @@ with open(outputfile, "w") as wf:
             # Get hash of the string to print:
             hash_object = hashlib.sha512(toPrint)
             hex_dig = hash_object.hexdigest()
-            wf.write("%s:%s\n" % (hex_dig, toPrint))
+            wf.write("%s:%s:%s\n" % (hex_dig, tag, toPrint))
     

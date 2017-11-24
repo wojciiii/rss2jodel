@@ -1,5 +1,7 @@
 #!/bin/bash
 
+DEBUG=1
+
 # File used to store hashes:
 HASH_FILE="hashes"
 # Where to write the found topics:
@@ -29,9 +31,12 @@ do
     grep -c "${FIRST}" ${HASH_FILE} &> /dev/null
     RET=$?
     if [[ "${RET}" -ne "0" ]]; then
-        SECOND=$(echo ${LINE}| cut -d ":" -f 2-)
-        echo "New:${SECOND}"
-        echo "(nyhed) ${SECOND}" >> "${TOPICS}"
+        SECOND=$(echo ${LINE}| cut -d ":" -f 2)
+        THIRD=$(echo ${LINE}| cut -d ":" -f 3)
+        if [[ "${DEBUG}" == "1" ]]; then
+            echo "New:${THIRD}"
+        fi
+        echo "${SECOND}:(nyhed) ${THIRD}" >> "${TOPICS}"
         echo "${FIRST}" >> "${HASH_FILE}"
     fi
 done
@@ -39,7 +44,11 @@ IFS=${SAVED_IFS}
 
 if [[ -e "${TOPICS}" ]]; then
     COUNT=$(wc -l ${TOPICS} | cut -d " " -f1)
-    echo "Jodling ${COUNT} topic(s) from ${TOPICS}"
-    ./publish.sh "${TOPICS}" &
+    if [[ "${DEBUG}" == "1" ]]; then
+        echo "Jodling ${COUNT} topic(s) from ${TOPICS}"
+        ./publish.sh "${TOPICS}"
+    else
+        ./publish.sh "${TOPICS}" &
+    fi
     exit 0
 fi

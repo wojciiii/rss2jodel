@@ -18,6 +18,8 @@ import android.support.test.uiautomator.UiSelector;
 import android.support.test.uiautomator.Until;
 import android.util.Base64;
 import android.util.Log;
+import android.view.KeyCharacterMap;
+import android.view.KeyEvent;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -42,8 +44,13 @@ public class JodelAddTest {
     private static final String STRING_TO_BE_TYPED = "UiAutomator";
     private UiDevice mDevice;
 
+    private boolean mGotHash;
+    private String mHash;
+
     private boolean mGotText;
     private String mText;
+
+    static KeyCharacterMap mCharMap;
 
     @Before
     public void startMainActivityFromHomeScreen() {
@@ -51,11 +58,28 @@ public class JodelAddTest {
         try {
             Bundle extras = InstrumentationRegistry.getArguments();
 
-            String input = extras.getString("input_string");
+            String input1 = extras.getString("input_string1");
 
-            Log.d(TAG, "Got input: " + input);
+            Log.d(TAG, "Got input1: " + input1);
 
-            byte[] data = Base64.decode(input, Base64.DEFAULT);
+            byte[] data = Base64.decode(input1, Base64.DEFAULT);
+            mHash = new String(data, "UTF-8");
+            Log.d(TAG, "Got hash: " + mHash);
+            mGotHash = true;
+        } catch (Exception e) {
+            mGotHash = false;
+            mHash = "";
+            Log.e(TAG, "Error:" + e.toString());
+        }
+
+        try {
+            Bundle extras = InstrumentationRegistry.getArguments();
+
+            String input2 = extras.getString("input_string2");
+
+            Log.d(TAG, "Got input2: " + input2);
+
+            byte[] data = Base64.decode(input2, Base64.DEFAULT);
             mText = new String(data, "UTF-8");
             Log.d(TAG, "Got text: " + mText);
             mGotText = true;
@@ -88,10 +112,16 @@ public class JodelAddTest {
         mDevice.wait(Until.hasObject(By.pkg(BASIC_SAMPLE_PACKAGE).depth(0)),
                 LAUNCH_TIMEOUT);
 
-
+        mCharMap = KeyCharacterMap.load(KeyCharacterMap.VIRTUAL_KEYBOARD);
     }
 
     static int defaultWait = 1000;
+
+    static KeyEvent[] getEvents(String input) {
+        KeyEvent[] events = mCharMap.getEvents(input.toCharArray());
+
+        return events;
+    }
 
     @Test
     public void testJodelAddNewPost() {
@@ -124,11 +154,15 @@ public class JodelAddTest {
         SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
         String string  = dateFormat.format(new Date());
 
+        KeyEvent events[] = getEvents(mText);
+
         try {
+            text.clearTextField();
             text.setText(mText);
-            hashtag.setText("#news");
-            //text.setText("Klokken er " + string);
-            //hashtag.setText("#jajaja");
+
+            if (mGotHash) {
+                hashtag.setText("#"+mHash);
+            }
             sendBtn.click();
         }
         catch (Exception e) {
